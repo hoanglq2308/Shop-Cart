@@ -1,0 +1,69 @@
+erDiagram
+    USERS ||--o| CARTS : "1 user có 1 giỏ hàng"
+    USERS ||--o{ ORDERS : "1 user có nhiều đơn hàng"
+    PRODUCTS ||--o{ CART_ITEMS : "1 sản phẩm nằm trong nhiều giỏ"
+    PRODUCTS ||--o{ ORDER_ITEMS : "1 sản phẩm nằm trong nhiều đơn"
+    CARTS ||--o{ CART_ITEMS : "1 giỏ chứa nhiều chi tiết"
+    ORDERS ||--o{ ORDER_ITEMS : "1 đơn chứa nhiều chi tiết"
+    COUPONS |o--o{ ORDERS : "1 mã áp dụng nhiều đơn"
+
+    USERS {
+        BIGSERIAL id PK
+        VARCHAR email UK "NOT NULL"
+        VARCHAR full_name "NOT NULL"
+        VARCHAR phone
+    }
+
+    PRODUCTS {
+        BIGSERIAL id PK
+        VARCHAR name "NOT NULL"
+        DECIMAL price ">= 0"
+        INT stock_quantity ">= 0"
+        VARCHAR status "ACTIVE/INACTIVE"
+    }
+
+    COUPONS {
+        BIGSERIAL id PK
+        VARCHAR code UK "NOT NULL"
+        VARCHAR discount_type "PERCENTAGE/FIXED"
+        DECIMAL discount_value "> 0"
+        DECIMAL min_order_value "DEFAULT 0"
+        INT usage_limit "DEFAULT 1"
+        INT used_count "DEFAULT 0"
+        TIMESTAMP expiry_date "NOT NULL"
+        BOOLEAN is_active "DEFAULT TRUE"
+    }
+
+    CARTS {
+        BIGSERIAL id PK
+        BIGINT user_id FK "UNIQUE"
+    }
+
+    CART_ITEMS {
+        BIGSERIAL id PK
+        BIGINT cart_id FK
+        BIGINT product_id FK
+        INT quantity ">= 1"
+    }
+
+    ORDERS {
+        BIGSERIAL id PK
+        BIGINT user_id FK
+        BIGINT coupon_id FK "NULLABLE"
+        DECIMAL subtotal ">= 0"
+        DECIMAL shipping_fee ">= 0"
+        DECIMAL discount_amount ">= 0"
+        DECIMAL total_price "> 0"
+        TEXT shipping_address "NOT NULL"
+        VARCHAR payment_method "NOT NULL"
+        VARCHAR status "PENDING/PAID/SHIPPED/CANCELLED"
+        TIMESTAMP created_at
+    }
+
+    ORDER_ITEMS {
+        BIGSERIAL id PK
+        BIGINT order_id FK
+        BIGINT product_id FK
+        INT quantity ">= 1"
+        DECIMAL unit_price ">= 0"
+    }
