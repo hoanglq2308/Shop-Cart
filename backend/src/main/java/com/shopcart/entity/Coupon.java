@@ -8,6 +8,9 @@ public class Coupon {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
+    @OneToMany(mappedBy = "coupon")
+    private java.util.List<Order> orders;
+
     @Column(name = "code", nullable = false, unique = true)
     private String code;
     @Column(name = "discount_type", nullable = false, length = 20)
