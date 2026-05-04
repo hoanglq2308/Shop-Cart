@@ -12,7 +12,7 @@ public class OrderItem {
     @ManyToOne
     @JoinColumn(name = "order_id", referencedColumnName = "id", nullable =
     false)
-    private Order orderId;
+    private Order order;
     @ManyToOne
     @JoinColumn(name = "product_id", referencedColumnName = "id", nullable = false) 
     private Product productId;

@@ -1,10 +1,6 @@
 package com.shopcart.entity;
 
 import java.util.List;
-
-import org.hibernate.annotations.Collate;
-
-import jakarta.annotation.Generated;
 import jakarta.persistence.*;
 
 

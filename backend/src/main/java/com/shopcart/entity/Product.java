@@ -11,10 +11,8 @@ import jakarta.persistence.*;
         @Id
         @GeneratedValue(strategy = GenerationType.IDENTITY)
         private Long id;
-        @OneToMany(mappedBy = "product")
-        private java.util.List<OrderItem> orderItems;
-        @OneToMany(mappedBy = "product")
-        private java.util.List<CartItem> cartItems;
+        
+        
         @Column(name = "name", nullable = false)
         private String name;
         @Column(name = "stock_quantity", nullable = false)
