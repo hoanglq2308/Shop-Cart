@@ -1,7 +1,9 @@
 package com.shopcart.entity;
 
 import jakarta.persistence.*;
-
+import lombok.*;
+@Getter
+@Setter
 @Entity
 @Table(name = "cart_items")
 public class CartItem {
