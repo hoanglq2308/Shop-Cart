@@ -22,7 +22,7 @@ public class CartService {
     private ProductRepository productRepository;
 
     public void addToCart(Long userId, Long productId, int quantity) {
-        Product product = productRepository.findById(productId).orElseThrow(() -> new RuntimeException("Sản phẩm này không tồn tại"));
+        Product product = productRepository.findById(productId).orElseThrow(() -> new RuntimeException("Sản phẩm không tồn tại"));
         if(product.getStockQuantity() <= 0) {
             throw new RuntimeException("Hết hàng");
         }else if (quantity > product.getStockQuantity()) {

@@ -38,7 +38,21 @@ public class CartServiceTest {
     @InjectMocks
     private CartService cartService;
     @Test
-    @DisplayName("thêm sản phẩm với số lượng vượt quá tồn kho hiện tại")
+    @DisplayName("Thêm Sản Phẩm vào giỏ hàng thành công")
+    public void TestAddToCart_Success(){
+        Long userId = 1L;
+        Long ProductId = 1L;
+        int requestQuantity = 3;
+        Product mockProduct = new Product();
+        mockProduct.setId (ProductId);
+        mockProduct.setStockQuantity(5);
+        when(productRepository.findById(ProductId)).thenReturn(Optional.of(mockProduct));
+        cartService.addToCart(userId, ProductId, requestQuantity);
+        verify(cartRepository, times(1)).save(any());
+
+    }
+    @Test
+    @DisplayName("thêm sản phẩm khi tồn kho không đủ")
     public void TestAddToCart_ThrowException_WhenQuantityExceedsStock(){
         Long userId = 1L;
         Long productId = 1L;
@@ -54,20 +68,7 @@ public class CartServiceTest {
         });
         assertEquals("Số lượng yêu cầu vượt quá tồn kho hiện tại", exception.getMessage());
     }
-    @Test
-    @DisplayName("Thêm Sản Phẩm vào giỏ hàng thành công")
-    public void TestAddToCart_Success(){
-        Long userId = 1L;
-        Long ProductId = 1L;
-        int requestQuantity = 3;
-        Product mockProduct = new Product();
-        mockProduct.setId (ProductId);
-        mockProduct.setStockQuantity(5);
-        when(productRepository.findById(ProductId)).thenReturn(Optional.of(mockProduct));
-        cartService.addToCart(userId, ProductId, requestQuantity);
-        verify(cartRepository, times(1)).save(any());
-
-    }
+    
     @Test
     @DisplayName("Thêm sản sản phẩm vào giỏ đã tồn tại của User")
     public void TestAddToCart_WhenUserHasExistingCart(){
@@ -87,6 +88,46 @@ public class CartServiceTest {
         verify(cartItemRepository, times(1)).save(any());
 
     }
+    @Test
+    @DisplayName("Thêm sản phẩm đã có trong giỏ (cộng dồn số lượng)")
+    public void TestUpdateCartItemQuantity_Success(){
+        Long UserId = 1L;
+        Long ProductId = 1L;
+        Long CartItemId = 1L;
+        Long CartId = 1L;
+        int newQlty = 4;
+        // gia lap san pham
+        Product mockProduct = new Product();
+        mockProduct.setId(ProductId);
+        mockProduct.setStockQuantity(10);
+        // gia lap gio hang
+        Cart mockCart = new Cart();
+        mockCart.setId(CartId);
+        // gia lap chi tiet gio hang
+        CartItem mockCartItem = new CartItem();
+        mockCartItem.setId(CartItemId);
+        mockCartItem.setProductId(mockProduct);
+        
+        when(cartRepository.findByUserId(UserId)).thenReturn(Optional.of(mockCart));
+        when(cartItemRepository.findByCartIdAndProductId(mockCart.getId(),ProductId)).thenReturn(Optional.of(mockCartItem));
+       
+        cartService.updateCartItemQuantity(UserId, ProductId, newQlty);
+        assertEquals(newQlty, mockCartItem.getQuantity());
+        verify(cartItemRepository, times(1)).save(mockCartItem);
+    }
+    @Test
+    @DisplayName("Thêm sản phẩm không tồn tại")
+    public void TestAddToCart_ThrowException_WhenProductNotFound(){
+        Long userId = 1L;
+        Long productId = 1L;
+        int requestQuantity = 1;
+        when(productRepository.findById(productId)).thenReturn(Optional.empty());
+        RuntimeException exception = assertThrows(RuntimeException.class,() -> {
+            cartService.addToCart(userId,productId, requestQuantity);
+        });
+        assertEquals("Sản phẩm không tồn tại", exception.getMessage());
+    }
+
     @Test
     @DisplayName("Thêm sản phẩm khi đã hết hàng tồn kho = 0")
     public void TestAddToCart_ThrowException_WhenStockQuantityIsZero(){
@@ -126,33 +167,5 @@ public class CartServiceTest {
 
         
     }
-    @Test
-    @DisplayName("Cập Nhật Số Lượng Sản Phẩm Trong Giỏ Hàng")
-    public void TestUpdateCartItemQuantity_Success(){
-        Long UserId = 1L;
-        Long ProductId = 1L;
-        Long CartItemId = 1L;
-        Long CartId = 1L;
-        int newQlty = 4;
-        // gia lap san pham
-        Product mockProduct = new Product();
-        mockProduct.setId(ProductId);
-        mockProduct.setStockQuantity(10);
-        // gia lap gio hang
-        Cart mockCart = new Cart();
-        mockCart.setId(CartId);
-        // gia lap chi tiet gio hang
-        CartItem mockCartItem = new CartItem();
-        mockCartItem.setId(CartItemId);
-        mockCartItem.setProductId(mockProduct);
-        
-        when(cartRepository.findByUserId(UserId)).thenReturn(Optional.of(mockCart));
-        when(cartItemRepository.findByCartIdAndProductId(mockCart.getId(),ProductId)).thenReturn(Optional.of(mockCartItem));
-       
-        cartService.updateCartItemQuantity(UserId, ProductId, newQlty);
-        assertEquals(newQlty, mockCartItem.getQuantity());
-        verify(cartItemRepository, times(1)).save(mockCartItem);
-
-
-    }
+    
 }
