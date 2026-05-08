@@ -25,3 +25,8 @@ replay_pid*
 
 # macOS metadata
 .DS_Store
+
+# Local docs and personal artifacts
+/docs/
+/performance/
+/Assignment_Cart_Shopping.pdf

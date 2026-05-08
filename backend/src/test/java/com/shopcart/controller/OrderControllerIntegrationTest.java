@@ -100,6 +100,35 @@ class OrderControllerIntegrationTest {
     }
 
     @Test
+    void postApiOrders_whenProvidedTotalMismatch_shouldReturn400AndErrorJsonStructure() throws Exception {
+        // Arrange
+        String payload = """
+                {
+                  "userId": %d,
+                  "shippingAddress": "123 Nguyen Trai, Quan 1",
+                  "paymentMethod": "COD",
+                  "shippingFee": 15000,
+                  "total": 1,
+                  "items": [
+                    { "productId": %d, "quantity": 2 }
+                  ]
+                }
+                """.formatted(user.getId(), product.getId());
+
+        // Act & Assert
+        mockMvc.perform(post("/api/orders")
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .content(payload))
+                .andExpect(status().isBadRequest())
+                .andExpect(jsonPath("$.code").value("BUSINESS_RULE_VIOLATION"))
+                .andExpect(jsonPath("$.message").value("Provided total does not match calculated total"))
+                .andExpect(jsonPath("$.timestamp").exists());
+
+        Product reloaded = productRepository.findById(product.getId()).orElseThrow();
+        assertThat(reloaded.getStockQuantity()).isEqualTo(10);
+    }
+
+    @Test
     void getApiOrdersById_whenOrderExists_shouldReturnCreatedOrder() throws Exception {
         // Arrange
         String payload = """

@@ -107,6 +107,51 @@ class OrderServiceTest {
     }
 
     @Test
+    void createOrder_whenProvidedTotalDoesNotMatchCalculatedTotal_shouldRejectOrderAndKeepStock() {
+        // Arrange
+        User user = user(1L);
+        Product monitor = product(10L, "Monitor", "100.00", 5, ProductStatus.ACTIVE);
+        OrderRequest request = orderRequest(
+                1L,
+                "10.00",
+                null,
+                List.of(new OrderItemRequest(10L, 2)),
+                new BigDecimal("999.00")
+        );
+
+        when(userRepository.findById(1L)).thenReturn(Optional.of(user));
+        when(inventoryRepository.findByIdForUpdate(10L)).thenReturn(Optional.of(monitor));
+
+        // Act & Assert
+        assertThatThrownBy(() -> orderService.createOrder(request))
+                .isInstanceOf(BusinessException.class)
+                .hasMessageContaining("does not match calculated total");
+        assertThat(monitor.getStockQuantity()).isEqualTo(5);
+        verify(orderRepository, never()).save(any(Order.class));
+    }
+
+    @Test
+    void createOrder_whenShippingAddressBlank_shouldThrowBusinessException() {
+        // Arrange
+        OrderRequest request = new OrderRequest(
+                1L,
+                List.of(new OrderItemRequest(10L, 1)),
+                BigDecimal.ZERO,
+                "   ",
+                "COD",
+                null,
+                null,
+                new BigDecimal("100.00")
+        );
+
+        // Act & Assert
+        assertThatThrownBy(() -> orderService.createOrder(request))
+                .isInstanceOf(BusinessException.class)
+                .hasMessageContaining("shippingAddress must not be blank");
+        verify(orderRepository, never()).save(any(Order.class));
+    }
+
+    @Test
     void getOrderById_whenOrderExists_shouldReturnOrder() {
         // Arrange
         Order order = order(44L, OrderStatus.PENDING, product(10L, "Monitor", "100.00", 5, ProductStatus.ACTIVE), 1);
@@ -249,6 +294,11 @@ class OrderServiceTest {
     }
 
     private OrderRequest orderRequest(Long userId, String shippingFee, String couponCode, List<OrderItemRequest> items) {
+        return orderRequest(userId, shippingFee, couponCode, items, null);
+    }
+
+    private OrderRequest orderRequest(Long userId, String shippingFee, String couponCode,
+                                      List<OrderItemRequest> items, BigDecimal total) {
         return new OrderRequest(
                 userId,
                 items,
@@ -257,7 +307,7 @@ class OrderServiceTest {
                 "COD",
                 couponCode,
                 null,
-                null
+                total
         );
     }
 

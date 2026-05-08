@@ -62,6 +62,7 @@ public class OrderService {
         if (pricing.total().totalPrice().compareTo(BigDecimal.ZERO) <= 0) {
             throw new BusinessException("totalPrice must be greater than 0");
         }
+        validateProvidedTotal(request.total(), pricing.total().totalPrice());
 
         Order order = new Order();
         order.setUser(user);
@@ -253,6 +254,19 @@ public class OrderService {
         }
         return couponRepository.findByCodeIgnoreCase(couponCode.trim())
                 .filter(coupon -> coupon.canApply(subtotal, LocalDateTime.now()));
+    }
+
+    private void validateProvidedTotal(BigDecimal providedTotal, BigDecimal calculatedTotal) {
+        if (providedTotal == null) {
+            return;
+        }
+        BigDecimal normalizedProvidedTotal = money(providedTotal);
+        if (normalizedProvidedTotal.compareTo(BigDecimal.ZERO) <= 0) {
+            throw new BusinessException("totalPrice must be greater than 0");
+        }
+        if (normalizedProvidedTotal.compareTo(calculatedTotal) != 0) {
+            throw new BusinessException("Provided total does not match calculated total");
+        }
     }
 
     private BigDecimal calculateDiscount(Coupon coupon, BigDecimal subtotal) {
