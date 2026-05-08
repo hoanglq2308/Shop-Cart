@@ -7,10 +7,12 @@ import java.util.Optional;
 // import com.shopcart.repository.CartRepository;
 // import com.shopcart.repository.CartItemRepository;
 import com.shopcart.repository.*;
+import com.shopcart.dto.CartResponse;
 import com.shopcart.entity.Cart;
 import com.shopcart.entity.CartItem;
 import com.shopcart.entity.Product;
 import com.shopcart.entity.User;
+import java.math.BigDecimal;
 
 @Service
 public class CartService {
@@ -21,7 +23,7 @@ public class CartService {
     @Autowired
     private ProductRepository productRepository;
 
-    public void addToCart(Long userId, Long productId, int quantity) {
+    public CartResponse addToCart(Long userId, Long productId, int quantity) {
         Product product = productRepository.findById(productId).orElseThrow(() -> new RuntimeException("Sản phẩm không tồn tại"));
         if(product.getStockQuantity() <= 0) {
             throw new RuntimeException("Hết hàng");
@@ -46,6 +48,7 @@ public class CartService {
             cartItem.setProductId(product);
             cartItem.setQuantity(quantity);
             cartItemRepository.save(cartItem);
+            return new CartResponse(true, "Thêm vào giỏ hàng thành công", product.getPrice().multiply(new BigDecimal(cartItem.getQuantity())).longValue());
         }
         
         

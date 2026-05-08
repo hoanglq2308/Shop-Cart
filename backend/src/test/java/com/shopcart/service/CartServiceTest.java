@@ -44,6 +44,7 @@ public class CartServiceTest {
         Long ProductId = 1L;
         int requestQuantity = 3;
         Product mockProduct = new Product();
+        mockProduct.setPrice(new java.math.BigDecimal("15000000"));
         mockProduct.setId (ProductId);
         mockProduct.setStockQuantity(5);
         when(productRepository.findById(ProductId)).thenReturn(Optional.of(mockProduct));
@@ -79,6 +80,7 @@ public class CartServiceTest {
         Product mockProduct = new Product();
         mockProduct.setId(ProductId);
         mockProduct.setStockQuantity(5);
+        mockProduct.setPrice(new java.math.BigDecimal("15000000"));
         Cart mockCart = new Cart();
         mockCart.setId(111L);
         when(cartRepository.findByUserId(userId)).thenReturn(Optional.of(mockCart));
