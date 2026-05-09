@@ -4,12 +4,12 @@ const navItems = [
   { key: 'about', label: 'Giới thiệu' },
 ]
 
-export default function TopBar({ activePage, cartCount, onNavigateShop, onNavigateCart }) {
+export default function TopBar({ activePage, cartCount, currentUser, onNavigateShop, onNavigateCart, onOpenAuth }) {
   return (
-    <header className="sticky top-0 z-50 border-b border-white/10 bg-[#121826] shadow-sm">
+    <header className="sticky top-0 z-50 border-b border-zinc-200 bg-white/95 shadow-sm backdrop-blur">
       <div className="mx-auto flex w-full max-w-[1280px] items-center justify-between px-4 py-4 md:px-8">
         <button
-          className="text-2xl font-black tracking-[0.18em] text-white"
+          className="text-2xl font-black tracking-[0.18em] text-zinc-900"
           onClick={onNavigateShop}
           type="button"
         >
@@ -21,8 +21,8 @@ export default function TopBar({ activePage, cartCount, onNavigateShop, onNaviga
             <button
               className={
                 activePage === item.key
-                  ? 'border-b-2 border-emerald-500 pb-1 font-semibold text-white'
-                  : 'border-b-2 border-transparent pb-1 font-medium text-slate-300 transition-colors hover:text-white'
+                  ? 'border-b-2 border-emerald-600 pb-1 font-semibold text-zinc-900'
+                  : 'border-b-2 border-transparent pb-1 font-medium text-zinc-600 transition-colors hover:text-zinc-900'
               }
               key={item.label}
               onClick={item.key === 'shop' ? onNavigateShop : undefined}
@@ -33,22 +33,33 @@ export default function TopBar({ activePage, cartCount, onNavigateShop, onNaviga
           ))}
         </nav>
 
-        <div className="flex items-center gap-2 text-emerald-500 md:gap-4">
+        <div className="flex items-center gap-2 text-emerald-700 md:gap-4">
+          <button
+            className="flex items-center gap-2 rounded-full border border-zinc-200 bg-white px-4 py-2 text-sm font-semibold text-zinc-800 transition hover:border-zinc-300 hover:bg-zinc-50"
+            onClick={onOpenAuth}
+            type="button"
+          >
+            <span className="material-symbols-outlined text-[18px]">
+              {currentUser ? 'person' : 'login'}
+            </span>
+            <span>{currentUser ? currentUser.name.split(' ')[0] : 'Đăng nhập'}</span>
+          </button>
+
           <button
             aria-label="Tìm kiếm"
-            className="rounded-full p-2 transition-colors hover:bg-white/5 hover:text-white"
+            className="rounded-full p-2 transition-colors hover:bg-zinc-100 hover:text-zinc-900"
           >
             <span className="material-symbols-outlined">search</span>
           </button>
 
           <button
             aria-label="Giỏ hàng"
-            className="relative rounded-full p-2 transition-colors hover:bg-white/5 hover:text-white"
+            className="relative rounded-full p-2 transition-colors hover:bg-zinc-100 hover:text-zinc-900"
             onClick={onNavigateCart}
             type="button"
           >
             <span className="material-symbols-outlined">shopping_cart</span>
-            <span className="absolute -right-1 -top-1 inline-flex min-h-4 min-w-4 items-center justify-center rounded-full border-2 border-[#121826] bg-emerald-500 px-1 text-[10px] font-bold text-white">
+            <span className="absolute -right-1 -top-1 inline-flex min-h-4 min-w-4 items-center justify-center rounded-full border-2 border-white bg-emerald-500 px-1 text-[10px] font-bold text-white shadow-sm">
               {cartCount}
             </span>
           </button>

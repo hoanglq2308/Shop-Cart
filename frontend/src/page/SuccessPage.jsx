@@ -2,6 +2,7 @@ export default function SuccessPage({ order }) {
   const orderId = order?.id ?? '#LUXE-000000'
   const total = order?.total ?? 0
   const payment = order?.payment ?? 'COD'
+  const isGuestOrder = Boolean(order?.guest)
 
   return (
     <div className="min-h-screen bg-[#fcf8fa] text-zinc-900 flex flex-col">
@@ -22,6 +23,12 @@ export default function SuccessPage({ order }) {
         </div>
 
         <div className="w-full bg-white rounded-xl shadow-[0_4px_20px_rgba(0,0,0,0.05)] border border-zinc-200 p-6 mb-8">
+          <div className={`mb-4 rounded-lg px-4 py-3 text-sm ${isGuestOrder ? 'bg-zinc-100 text-zinc-700' : 'bg-emerald-50 text-emerald-800'}`}>
+            {isGuestOrder
+              ? 'Bạn đang mua với tư cách khách nên đơn hàng này không được lưu vào lịch sử tài khoản.'
+              : 'Đơn hàng này đã được lưu vào lịch sử tài khoản để bạn xem lại sau.'}
+          </div>
+
           <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center mb-4 bg-zinc-50 p-3 rounded">
             <span className="text-sm text-zinc-500">Mã đơn hàng</span>
             <span className="text-lg font-bold">{orderId}</span>

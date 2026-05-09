@@ -8,11 +8,26 @@ export default function CartPage({
   onIncreaseItem,
   onRemoveItem,
   onCheckout,
+  isLoading,
 }) {
   const subtotal = useMemo(
     () => cartItems.reduce((sum, item) => sum + item.product.price * item.quantity, 0),
     [cartItems],
   )
+
+  if (isLoading) {
+    return (
+      <main className="mx-auto w-full max-w-[1280px] px-4 py-8 md:px-8 md:py-12">
+        <div className="mb-8">
+          <h1 className="text-3xl font-bold text-zinc-900 md:text-5xl">Giỏ hàng</h1>
+          <p className="mt-2 text-zinc-600">Kiểm tra lại các sản phẩm của bạn trước khi thanh toán.</p>
+        </div>
+        <div className="rounded border border-dashed border-zinc-300 bg-white p-10 text-center">
+          <p className="text-lg font-semibold text-zinc-900">Đang tải giỏ hàng...</p>
+        </div>
+      </main>
+    )
+  }
 
   return (
     <main className="mx-auto w-full max-w-[1280px] px-4 py-8 md:px-8 md:py-12">
@@ -32,7 +47,7 @@ export default function CartPage({
             {cartItems.map((item) => (
               <CartItemRow
                 item={item}
-                key={item.product.id}
+                key={item.cartItemId}
                 onDecrease={onDecreaseItem}
                 onIncrease={onIncreaseItem}
                 onRemove={onRemoveItem}

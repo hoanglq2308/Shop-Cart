@@ -34,7 +34,7 @@ export default function CartItemRow({ item, onDecrease, onIncrease, onRemove }) 
             <button
               aria-label="Giảm số lượng"
               className="flex h-full w-10 items-center justify-center text-zinc-600 transition-colors hover:bg-zinc-100"
-              onClick={() => onDecrease(item.product.id)}
+              onClick={() => onDecrease(item.cartItemId, item.product.id)}
               type="button"
             >
               <span className="material-symbols-outlined text-[18px]">remove</span>
@@ -46,7 +46,7 @@ export default function CartItemRow({ item, onDecrease, onIncrease, onRemove }) 
               aria-label="Tăng số lượng"
               className="flex h-full w-10 items-center justify-center text-zinc-600 transition-colors hover:bg-zinc-100 disabled:cursor-not-allowed disabled:opacity-40"
               disabled={item.quantity >= item.product.stock}
-              onClick={() => onIncrease(item.product.id)}
+              onClick={() => onIncrease(item.cartItemId, item.product.id)}
               type="button"
             >
               <span className="material-symbols-outlined text-[18px]">add</span>
@@ -56,7 +56,7 @@ export default function CartItemRow({ item, onDecrease, onIncrease, onRemove }) 
           <button
             aria-label="Xóa sản phẩm"
             className="flex items-center gap-1 text-zinc-500 transition-colors hover:text-red-600"
-            onClick={() => onRemove(item.product.id)}
+            onClick={() => onRemove(item.cartItemId, item.product.id)}
             type="button"
           >
             <span className="material-symbols-outlined">delete</span>

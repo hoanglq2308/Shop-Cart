@@ -6,7 +6,7 @@ export default defineConfig({
   plugins: [react()],
   test: {
     environment: 'jsdom',
-    include: ['src/tests/**/*.test.js'],
+    include: ['tests/**/*.{test.js,test.jsx,test.ts,test.tsx}'],
     coverage: {
       provider: 'v8',
       reporter: ['text', 'html'],
