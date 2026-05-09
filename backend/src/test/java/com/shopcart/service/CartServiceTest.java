@@ -93,27 +93,22 @@ public class CartServiceTest {
     @Test
     @DisplayName("Thêm sản phẩm đã có trong giỏ (cộng dồn số lượng)")
     public void TestUpdateCartItemQuantity_Success(){
-        Long UserId = 1L;
-        Long ProductId = 1L;
         Long CartItemId = 1L;
-        Long CartId = 1L;
+        Long ProductId = 1L;
         int newQlty = 4;
         // gia lap san pham
         Product mockProduct = new Product();
         mockProduct.setId(ProductId);
         mockProduct.setStockQuantity(10);
-        // gia lap gio hang
-        Cart mockCart = new Cart();
-        mockCart.setId(CartId);
         // gia lap chi tiet gio hang
         CartItem mockCartItem = new CartItem();
         mockCartItem.setId(CartItemId);
-        mockCartItem.setProductId(mockProduct);
+        mockCartItem.setProduct(mockProduct);
+        mockCartItem.setQuantity(2);
         
-        when(cartRepository.findByUserId(UserId)).thenReturn(Optional.of(mockCart));
-        when(cartItemRepository.findByCartIdAndProductId(mockCart.getId(),ProductId)).thenReturn(Optional.of(mockCartItem));
+        when(cartItemRepository.findById(CartItemId)).thenReturn(Optional.of(mockCartItem));
        
-        cartService.updateCartItemQuantity(UserId, ProductId, newQlty);
+        cartService.updateCartItemQuantity(CartItemId, newQlty);
         assertEquals(newQlty, mockCartItem.getQuantity());
         verify(cartItemRepository, times(1)).save(mockCartItem);
     }
@@ -148,26 +143,19 @@ public class CartServiceTest {
     @Test
     @DisplayName("Xóa Sản Phẩm Khỏi Giỏ Hàng")
     public void TestRemoveFromCart_Success(){
-        Long userId = 1L;
-        Long productId = 1L;
         Long cartItemId = 1L;
+        Long productId = 1L;
         Product mockProduct = new Product();
-        // gia lap gio hang
-        Cart mockCart = new Cart(); 
-        mockCart.setId(1L);
         mockProduct.setId(productId);
         // gia lap chi tiet gio hang
         CartItem mockCartItem = new CartItem();
-        mockCartItem.setProductId(mockProduct);
+        mockCartItem.setProduct(mockProduct);
         mockCartItem.setId(cartItemId);       
-        // mockCart.setId(userId);
-        when(cartRepository.findByUserId(userId)).thenReturn(Optional.of(mockCart));
-        when(cartItemRepository.findByCartIdAndProductId(mockCart.getId(), productId)).thenReturn(Optional.of(mockCartItem));
         
-        cartService.removeFromCart(userId, productId);
+        when(cartItemRepository.findById(cartItemId)).thenReturn(Optional.of(mockCartItem));
+        
+        cartService.removeFromCart(cartItemId);
         verify(cartItemRepository, times(1)).delete(mockCartItem);
-
-        
     }
     
 }

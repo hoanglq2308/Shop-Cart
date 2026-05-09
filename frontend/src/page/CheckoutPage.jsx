@@ -19,7 +19,7 @@ const districts = [
   { value: 'tb', label: 'Quận Tân Bình' },
 ]
 
-export default function CheckoutPage({ cartItems, onBackToCart, onPlaceOrder }) {
+export default function CheckoutPage({ cartItems, customerDefaults, isAuthenticated, onBackToCart, onPlaceOrder }) {
   const [isSubmitting, setIsSubmitting] = useState(false)
   const { showLoading, hideLoading } = useLoading()
   const { addToast } = useToast()
@@ -48,13 +48,17 @@ export default function CheckoutPage({ cartItems, onBackToCart, onPlaceOrder }) 
     showLoading()
     setIsSubmitting(true)
 
+    const formData = new FormData(formEl)
+
     // collect minimal customer info from form
     const customer = {
-      name: formEl.fullName?.value || '',
-      phone: formEl.phone?.value || '',
-      address: formEl.address?.value || '',
-      city: formEl.city?.value || '',
-      district: formEl.district?.value || '',
+      fullName: formData.get('fullName')?.toString() || '',
+      phone: formData.get('phone')?.toString() || '',
+      address: formData.get('address')?.toString() || '',
+      city: formData.get('city')?.toString() || '',
+      district: formData.get('district')?.toString() || '',
+      cityLabel: cities.find((city) => city.value === formData.get('city'))?.label || '',
+      districtLabel: districts.find((district) => district.value === formData.get('district'))?.label || '',
     }
 
     const items = cartItems.map((it) => ({ productId: it.product.id, quantity: it.quantity }))
@@ -68,14 +72,30 @@ export default function CheckoutPage({ cartItems, onBackToCart, onPlaceOrder }) 
         hideLoading()
         setIsSubmitting(false)
         addToast({ type: 'success', title: 'Đặt hàng thành công', description: 'Đơn hàng đã được gửi tới hệ thống.' })
-        onPlaceOrder({ id: data.id ?? data.orderId ?? `#LUXE-${Math.floor(Math.random() * 900000 + 100000)}`, total: data.total ?? total, payment: data.payment ?? 'COD' })
+        onPlaceOrder({
+          id: data.id ?? data.orderId ?? `#LUXE-${Math.floor(Math.random() * 900000 + 100000)}`,
+          total: data.total ?? total,
+          payment: data.payment ?? 'COD',
+          items,
+          customer,
+          guest: !isAuthenticated,
+          createdAt: new Date().toISOString(),
+        })
       })
       .catch((err) => {
         hideLoading()
         setIsSubmitting(false)
         addToast({ type: 'error', title: 'Lỗi kết nối', description: 'Không thể kết nối tới máy chủ. Đơn hàng được tạo tạm thời.' })
         const id = `#LUXE-${Math.floor(Math.random() * 900000 + 100000)}`
-        onPlaceOrder({ id, total, payment: 'COD' })
+        onPlaceOrder({
+          id,
+          total,
+          payment: 'COD',
+          items,
+          customer,
+          guest: !isAuthenticated,
+          createdAt: new Date().toISOString(),
+        })
       })
   }
 
@@ -94,6 +114,11 @@ export default function CheckoutPage({ cartItems, onBackToCart, onPlaceOrder }) 
           <h1 className="text-3xl font-bold md:text-5xl">Thanh toán</h1>
           <p className="mt-2 text-zinc-600">
             Hoàn tất đơn hàng của bạn để trải nghiệm phong cách sống sang trọng.
+          </p>
+          <p className={`mt-2 text-sm ${isAuthenticated ? 'text-emerald-700' : 'text-zinc-500'}`}>
+            {isAuthenticated
+              ? 'Bạn đang đăng nhập, địa chỉ có thể được lưu tự động để lần sau điền nhanh hơn.'
+              : 'Bạn đang mua với tư cách khách. Đơn hàng vẫn được tạo, nhưng sẽ không lưu vào lịch sử.'}
           </p>
         </div>
 
@@ -115,7 +140,7 @@ export default function CheckoutPage({ cartItems, onBackToCart, onPlaceOrder }) 
               <div className="rounded-xl border border-zinc-200 bg-white p-6 shadow-[0px_4px_20px_rgba(0,0,0,0.05)]">
                 <h2 className="mb-4 text-2xl font-semibold">Thông tin giao hàng</h2>
 
-                <form className="space-y-4" id="checkout-form" onSubmit={handleSubmit}>
+                <form className="space-y-4" id="checkout-form" onSubmit={handleSubmit} key={customerDefaults?.email || 'guest'}>
                   <div className="grid grid-cols-1 gap-4 md:grid-cols-2">
                     <div className="flex flex-col gap-1">
                       <label className="text-xs font-semibold uppercase tracking-[0.06em] text-zinc-500" htmlFor="fullName">
@@ -127,6 +152,7 @@ export default function CheckoutPage({ cartItems, onBackToCart, onPlaceOrder }) 
                         name="fullName"
                         placeholder="Nguyễn Văn A"
                         required
+                        defaultValue={customerDefaults?.fullName || ''}
                         type="text"
                       />
                     </div>
@@ -141,6 +167,7 @@ export default function CheckoutPage({ cartItems, onBackToCart, onPlaceOrder }) 
                         name="phone"
                         placeholder="090 123 4567"
                         required
+                        defaultValue={customerDefaults?.phone || ''}
                         type="tel"
                       />
                     </div>
@@ -156,6 +183,7 @@ export default function CheckoutPage({ cartItems, onBackToCart, onPlaceOrder }) 
                       name="address"
                       placeholder="Số nhà, Tên đường, Phường/Xã..."
                       required
+                      defaultValue={customerDefaults?.address || ''}
                       type="text"
                     />
                   </div>
@@ -167,10 +195,10 @@ export default function CheckoutPage({ cartItems, onBackToCart, onPlaceOrder }) 
                       </label>
                       <select
                         className="h-12 rounded border border-zinc-300 bg-white px-4 text-sm outline-none transition focus:border-zinc-900"
-                        defaultValue=""
                         id="city"
                         name="city"
                         required
+                        defaultValue={customerDefaults?.city || ''}
                       >
                         <option disabled value="">
                           Chọn Tỉnh / Thành phố
@@ -189,10 +217,10 @@ export default function CheckoutPage({ cartItems, onBackToCart, onPlaceOrder }) 
                       </label>
                       <select
                         className="h-12 rounded border border-zinc-300 bg-white px-4 text-sm outline-none transition focus:border-zinc-900"
-                        defaultValue=""
                         id="district"
                         name="district"
                         required
+                        defaultValue={customerDefaults?.district || ''}
                       >
                         <option disabled value="">
                           Chọn Quận / Huyện

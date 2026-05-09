@@ -1,5 +1,4 @@
 -- ShopCart database schema for PostgreSQL
--- Covers user, product, coupon, cart, checkout, and order flows.
 
 -- =====================================================================
 -- 1. USERS
@@ -11,8 +10,7 @@ CREATE TABLE users (
     phone VARCHAR(20),
     password VARCHAR(255) NOT NULL,
     role VARCHAR(20) NOT NULL DEFAULT 'CUSTOMER' CHECK (role IN ('CUSTOMER', 'ADMIN')),
-    created_at TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP,
-    updated_at TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP
+    created_at TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP
 );
 
 -- =====================================================================
@@ -23,9 +21,7 @@ CREATE TABLE products (
     name VARCHAR(255) NOT NULL,
     price NUMERIC(10, 2) NOT NULL CHECK (price >= 0),
     stock_quantity INT NOT NULL CHECK (stock_quantity >= 0),
-    status VARCHAR(20) NOT NULL DEFAULT 'ACTIVE' CHECK (status IN ('ACTIVE', 'INACTIVE')),
-    created_at TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP,
-    updated_at TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP
+    status VARCHAR(20) NOT NULL DEFAULT 'ACTIVE' CHECK (status IN ('ACTIVE', 'INACTIVE'))
 );
 
 -- =====================================================================
@@ -40,9 +36,7 @@ CREATE TABLE coupons (
     usage_limit INT NOT NULL DEFAULT 1 CHECK (usage_limit >= 1),
     used_count INT NOT NULL DEFAULT 0 CHECK (used_count >= 0),
     expiry_date TIMESTAMP NOT NULL,
-    is_active BOOLEAN NOT NULL DEFAULT TRUE,
-    created_at TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP,
-    updated_at TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP
+    is_active BOOLEAN NOT NULL DEFAULT TRUE
 );
 
 -- =====================================================================
@@ -50,9 +44,7 @@ CREATE TABLE coupons (
 -- =====================================================================
 CREATE TABLE carts (
     id BIGSERIAL PRIMARY KEY,
-    user_id BIGINT UNIQUE NOT NULL REFERENCES users(id) ON DELETE CASCADE,
-    created_at TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP,
-    updated_at TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP
+    user_id BIGINT UNIQUE NOT NULL REFERENCES users(id) ON DELETE CASCADE
 );
 
 CREATE TABLE cart_items (
@@ -60,7 +52,6 @@ CREATE TABLE cart_items (
     cart_id BIGINT NOT NULL REFERENCES carts(id) ON DELETE CASCADE,
     product_id BIGINT NOT NULL REFERENCES products(id) ON DELETE CASCADE,
     quantity INT NOT NULL CHECK (quantity >= 1),
-    created_at TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP,
     updated_at TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP,
     UNIQUE(cart_id, product_id)
 );
@@ -88,13 +79,11 @@ CREATE TABLE order_items (
     order_id BIGINT NOT NULL REFERENCES orders(id) ON DELETE CASCADE,
     product_id BIGINT NOT NULL REFERENCES products(id),
     quantity INT NOT NULL CHECK (quantity >= 1),
-    unit_price NUMERIC(10, 2) NOT NULL CHECK (unit_price >= 0),
-    created_at TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP,
-    updated_at TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP
+    unit_price NUMERIC(10, 2) NOT NULL CHECK (unit_price >= 0)
 );
 
 -- =====================================================================
--- 6. INDEXES FOR COMMON LOOKUPS
+-- 6. INDEXES
 -- =====================================================================
 CREATE INDEX idx_products_status ON products(status);
 CREATE INDEX idx_coupons_code ON coupons(code);

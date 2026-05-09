@@ -2,7 +2,7 @@ import { describe, expect, test } from 'vitest'
 import {
   calculateOrderPrice,
   checkInventoryAvailability,
-} from '../utils/priceCalculation'
+} from '../src/utils/priceCalculation'
 
 describe('Price Calculation Tests', () => {
   test('TC1: Tinh tong gia khong co giam gia', () => {
