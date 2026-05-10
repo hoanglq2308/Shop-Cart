@@ -18,6 +18,8 @@ import lombok.Setter;
         
         @Column(name = "name", nullable = false)
         private String name;
+        @Column(name = "image_url", length = 512)
+        private String imageUrl;
         @Column(name = "stock_quantity", nullable = false)
         private int stockQuantity;
         @Column(name = "price", nullable = false, precision = 10, scale = 2)

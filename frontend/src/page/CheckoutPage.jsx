@@ -82,7 +82,7 @@ export default function CheckoutPage({ cartItems, customerDefaults, isAuthentica
           createdAt: new Date().toISOString(),
         })
       })
-      .catch((err) => {
+      .catch(() => {
         hideLoading()
         setIsSubmitting(false)
         addToast({ type: 'error', title: 'Lỗi kết nối', description: 'Không thể kết nối tới máy chủ. Đơn hàng được tạo tạm thời.' })
@@ -244,8 +244,8 @@ export default function CheckoutPage({ cartItems, customerDefaults, isAuthentica
                 <div className="mb-4 flex flex-col gap-2 border-b border-zinc-200 pb-4">
                   {cartItems.map((item) => (
                     <div className="flex items-center gap-2" key={item.product.id}>
-                      <div className="h-14 w-14 flex-shrink-0 overflow-hidden rounded bg-zinc-200">
-                        <img alt={item.product.name} className="h-full w-full object-cover" src={item.product.image} />
+                      <div className="h-14 w-14 flex-shrink-0 overflow-hidden rounded bg-zinc-200 p-1">
+                        <img alt={item.product.name} className="h-full w-full object-contain" src={item.product.imageUrl} />
                       </div>
                       <div className="flex-grow">
                         <h3 className="clamp-1 text-sm font-semibold text-zinc-900">{item.product.name}</h3>

@@ -31,13 +31,13 @@ export default function ProductCard({ product, onAddToCart }) {
         isOutOfStock ? 'opacity-80' : 'hover:-translate-y-0.5 hover:shadow-md'
       }`}
     >
-      <div className="relative h-56 overflow-hidden bg-zinc-100">
+      <div className="relative h-56 overflow-hidden bg-zinc-100 p-3">
         <img
           alt={product.name}
-          className={`h-full w-full object-cover transition duration-500 ${
+          className={`h-full w-full object-contain transition duration-500 ${
             isOutOfStock ? 'grayscale-[30%]' : 'group-hover:scale-103'
           }`}
-          src={product.image}
+          src={product.imageUrl}
         />
 
         {isOutOfStock && (

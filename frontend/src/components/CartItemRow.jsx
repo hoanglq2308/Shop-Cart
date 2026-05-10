@@ -7,8 +7,8 @@ export default function CartItemRow({ item, onDecrease, onIncrease, onRemove }) 
     <div className="relative flex flex-col gap-4 rounded border border-zinc-200 bg-white p-4 shadow-sm sm:flex-row">
       {isLowStock && <div className="absolute left-0 top-0 h-full w-1 rounded-l bg-red-500" />}
 
-      <div className="h-32 w-full flex-shrink-0 overflow-hidden rounded bg-zinc-100 sm:w-32">
-        <img alt={item.product.name} className="h-full w-full object-cover" src={item.product.image} />
+      <div className="h-32 w-full flex-shrink-0 overflow-hidden rounded bg-zinc-100 p-2 sm:w-32">
+        <img alt={item.product.name} className="h-full w-full object-contain" src={item.product.imageUrl} />
       </div>
 
       <div className="flex flex-grow flex-col justify-between">
