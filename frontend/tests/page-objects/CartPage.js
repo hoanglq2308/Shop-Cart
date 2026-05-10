@@ -36,7 +36,7 @@ export class CartPage {
   }
 
   async expectAddSuccessToast() {
-    await expect(this.page.getByText('Đã thêm vào giỏ')).toBeVisible()
+    await expect(this.page.getByText('Đã thêm vào giỏ').first()).toBeVisible()
   }
 
   async getQuantityForProduct(productName) {
@@ -71,5 +71,11 @@ export class CartPage {
     })
 
     await expect(row.getByText(`Chỉ còn ${stock} sản phẩm trong kho!`)).toBeVisible()
+  }
+
+  async applyCoupon(code) {
+    const couponInput = this.page.locator('input[id="coupon"]')
+    await couponInput.fill(code)
+    await this.page.getByRole('button', { name: 'Áp dụng' }).click()
   }
 }

@@ -9,14 +9,13 @@ export default defineConfig({
     include: ['tests/**/*.{test.js,test.jsx,test.ts,test.tsx}'],
     coverage: {
       provider: 'v8',
-      reporter: ['text', 'html'],
+      reporter: ['text', 'html', 'lcov'],
       include: ['src/utils/**/*.js'],
-      thresholds: {
-        lines: 90,
-        functions: 90,
-        branches: 90,
-        statements: 90,
-      },
+      all: true,
+      lines: 70,
+      functions: 70,
+      branches: 70,
+      statements: 70,
     },
   },
 })

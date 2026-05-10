@@ -41,4 +41,8 @@
     "vite": "^8.0.9",
     "vitest": "^4.1.5"
   }
+  ,
+  "vitest": {
+    "setupFiles": ["./vitest.setup.js"]
+  }
 }

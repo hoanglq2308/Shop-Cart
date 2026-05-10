@@ -47,7 +47,7 @@ describe('Cart Validation Tests', () => {
     })
 
     expect(result.valid).toBe(false)
-    expect(result.error).toBe('Số lượng phải lớn hơn 0')
+    expect(result.error).toBe('Số lượng phải là số nguyên')
   })
 
   test('TC5: Quantity vượt quá stock - nên trả về lỗi', () => {

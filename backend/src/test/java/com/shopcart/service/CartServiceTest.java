@@ -105,6 +105,10 @@ public class CartServiceTest {
         mockCartItem.setId(CartItemId);
         mockCartItem.setProduct(mockProduct);
         mockCartItem.setQuantity(2);
+        // attach a Cart to the CartItem to match service expectations
+        Cart mockCart = new Cart();
+        mockCart.setId(100L);
+        mockCartItem.setCart(mockCart);
         
         when(cartItemRepository.findById(CartItemId)).thenReturn(Optional.of(mockCartItem));
        
