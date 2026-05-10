@@ -38,23 +38,25 @@ export default function AuthModal({ isOpen, currentUser, onClose, onLogin, onLog
     return null
   }
 
-  const handleLoginSubmit = (event) => {
+  const handleLoginSubmit = async (event) => {
     event.preventDefault()
 
-    if (onLogin(loginForm)) {
+    const isSuccess = await onLogin(loginForm)
+    if (isSuccess) {
       setLoginForm(emptyLoginForm)
       onClose()
     }
   }
 
-  const handleRegisterSubmit = (event) => {
+  const handleRegisterSubmit = async (event) => {
     event.preventDefault()
 
     if (registerForm.password !== registerForm.confirmPassword) {
       return
     }
 
-    if (onRegister(registerForm)) {
+    const isSuccess = await onRegister(registerForm)
+    if (isSuccess) {
       setRegisterForm(emptyRegisterForm)
       onClose()
     }

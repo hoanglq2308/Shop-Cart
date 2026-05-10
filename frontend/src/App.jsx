@@ -9,6 +9,7 @@ import CheckoutPage from './page/CheckoutPage'
 import SuccessPage from './page/SuccessPage'
 import ShopPage from './page/ShopPage'
 import { getCart, addToCart, updateCartItemQuantity, removeCartItem } from './services/cartService'
+import { authService } from './services/authService'
 
 function App() {
   const [activePage, setActivePage] = useState('shop')
@@ -61,10 +62,13 @@ function App() {
   )
 
   const { addToast } = useToast()
-  const currentUser = useMemo(
-    () => accounts.find((account) => account.email === currentUserEmail) || null,
-    [accounts, currentUserEmail],
-  )
+  const currentUser = useMemo(() => {
+    if (!currentUserEmail) return null;
+    const account = accounts.find((acc) => acc.email === currentUserEmail);
+    if (account) return account;
+    // Fallback: If not in local accounts (e.g. from backend API), create a local account entry.
+    return { name: localStorage.getItem('currentUserName') || '', email: currentUserEmail, savedAddress: null, orders: [] };
+  }, [accounts, currentUserEmail])
 
   const handleAddToCart = async (product) => {
     if (product.stock === 0) {
@@ -179,48 +183,58 @@ function App() {
     setActivePage('success')
   }
 
-  const handleLogin = ({ email, password }) => {
-    const nextAccount = accounts.find((account) => account.email === email.trim())
+  const handleLogin = async ({ email, password }) => {
+    try {
+      const response = await authService.login({ email, password })
+      if (response && response.success) {
+        setCurrentUserEmail(response.email)
+        saveCurrentUserEmail(response.email)
+        localStorage.setItem('currentUserName', response.name)
+        
+        // Thêm tài khoản vào state local khi login thành công để logic Frontend hoạt động khớp data
+        if (!accounts.some(acc => acc.email === response.email)) {
+          const nextAccounts = [...accounts, { name: response.name, email: response.email, savedAddress: null, orders: [] }]
+          setAccounts(nextAccounts)
+          saveAccounts(nextAccounts)
+        }
 
-    if (!nextAccount || nextAccount.password !== password) {
-      addToast({ type: 'error', title: 'Đăng nhập thất bại', description: 'Email hoặc mật khẩu không đúng.' })
+        addToast({ type: 'success', title: 'Đăng nhập thành công', description: response.message || `Xin chào ${response.name}.` })
+        return true
+      }
+      return false
+    } catch (error) {
+      addToast({ type: 'error', title: 'Đăng nhập thất bại', description: error.message || 'Có lỗi xảy ra khi đăng nhập' })
       return false
     }
-
-    setCurrentUserEmail(nextAccount.email)
-    saveCurrentUserEmail(nextAccount.email)
-    addToast({ type: 'success', title: 'Đăng nhập thành công', description: `Xin chào ${nextAccount.name}.` })
-    return true
   }
 
-  const handleRegister = ({ name, email, password }) => {
-    const normalizedEmail = email.trim()
+  const handleRegister = async ({ name, email, password }) => {
+    try {
+      const response = await authService.register({ name, email, password })
+      if (response && response.success) {
+        setCurrentUserEmail(response.email)
+        saveCurrentUserEmail(response.email)
+        localStorage.setItem('currentUserName', response.name)
+        
+        // Nhớ lưu state vào local để Giao diện Modal load được Object Profile
+        const nextAccounts = [...accounts, { name: response.name, email: response.email, savedAddress: null, orders: [] }]
+        setAccounts(nextAccounts)
+        saveAccounts(nextAccounts)
 
-    if (accounts.some((account) => account.email === normalizedEmail)) {
-      addToast({ type: 'error', title: 'Không thể đăng ký', description: 'Email này đã tồn tại.' })
+        addToast({ type: 'success', title: 'Đăng ký thành công', description: response.message || 'Tài khoản đã được tạo.' })
+        return true
+      }
+      return false
+    } catch (error) {
+      addToast({ type: 'error', title: 'Không thể đăng ký', description: error.message || 'Có lỗi xảy ra khi đăng ký' })
       return false
     }
-
-    const nextAccount = {
-      name: name.trim(),
-      email: normalizedEmail,
-      password,
-      savedAddress: null,
-      orders: [],
-    }
-
-    const nextAccounts = [...accounts, nextAccount]
-    setAccounts(nextAccounts)
-    saveAccounts(nextAccounts)
-    setCurrentUserEmail(nextAccount.email)
-    saveCurrentUserEmail(nextAccount.email)
-    addToast({ type: 'success', title: 'Đăng ký thành công', description: 'Tài khoản đã được tạo.' })
-    return true
   }
 
   const handleLogout = () => {
     setCurrentUserEmail(null)
     saveCurrentUserEmail(null)
+    localStorage.removeItem('currentUserName')
     setIsAuthModalOpen(false)
     addToast({ type: 'success', title: 'Đã đăng xuất', description: 'Bạn đang mua hàng với tư cách khách.' })
   }
