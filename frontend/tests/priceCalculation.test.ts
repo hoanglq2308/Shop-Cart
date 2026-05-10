@@ -25,7 +25,7 @@ describe('Price Calculation Tests', () => {
       { price: 500000, quantity: 1 },
     ]
 
-    const coupon = { type: 'PERCENTAGE', value: 10 }
+    const coupon = { type: 'PERCENTAGE', value: 10 } as const
     const result = calculateOrderPrice(items, coupon, 30000)
 
     expect(result.subtotal).toBe(2500000)
@@ -36,7 +36,7 @@ describe('Price Calculation Tests', () => {
 
   test('TC3: Ap dung coupon giam so tien co dinh', () => {
     const items = [{ price: 1000000, quantity: 1 }]
-    const coupon = { type: 'FIXED_AMOUNT', value: 120000 }
+    const coupon = { type: 'FIXED_AMOUNT', value: 120000 } as const
 
     const result = calculateOrderPrice(items, coupon, 15000)
 
@@ -48,7 +48,7 @@ describe('Price Calculation Tests', () => {
 
   test('TC4: Discount khong duoc vuot qua subtotal', () => {
     const items = [{ price: 200000, quantity: 1 }]
-    const coupon = { type: 'FIXED_AMOUNT', value: 500000 }
+    const coupon = { type: 'FIXED_AMOUNT', value: 500000 } as const
 
     const result = calculateOrderPrice(items, coupon, 0)
 
@@ -71,7 +71,7 @@ describe('Price Calculation Tests', () => {
     const items = [
       { price: null, quantity: 2 },
       { price: 100000, quantity: undefined },
-    ]
+    ] as any
 
     const result = calculateOrderPrice(items, null, 0)
 
@@ -81,13 +81,24 @@ describe('Price Calculation Tests', () => {
 
   test('TC7: Coupon khong dung loai thi khong ap dung giam gia', () => {
     const items = [{ price: 500000, quantity: 1 }]
-    const coupon = { type: 'UNKNOWN', value: 50 }
+    const coupon = { type: 'UNKNOWN', value: 50 } as any
 
     const result = calculateOrderPrice(items, coupon, 20000)
 
     expect(result.subtotal).toBe(500000)
     expect(result.discount).toBe(0)
     expect(result.total).toBe(520000)
+  })
+
+  test('TC7.1: Coupon khong phan biet hoa thuong va khoang trang', () => {
+    const items = [{ price: 500000, quantity: 1 }]
+    const coupon = { type: ' percentage ', value: '10' } as any
+
+    const result = calculateOrderPrice(items, coupon, 20000)
+
+    expect(result.subtotal).toBe(500000)
+    expect(result.discount).toBe(50000)
+    expect(result.total).toBe(470000)
   })
 })
 

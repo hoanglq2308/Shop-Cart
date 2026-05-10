@@ -51,7 +51,7 @@ describe('Cart Component Integration Tests', () => {
     )
 
     await waitFor(() => {
-      expect(screen.getByText('Giỏ hàng của bạn đang trống')).toBeInTheDocument()
+      expect(screen.getByText('Giỏ hàng của bạn đang trống')).toBeDefined()
     })
   })
 
@@ -95,8 +95,8 @@ describe('Cart Component Integration Tests', () => {
       />,
     )
 
-    expect(screen.getByText('Laptop Dell')).toBeInTheDocument()
-    expect(screen.getByText('Mouse Logitech')).toBeInTheDocument()
+    expect(screen.getByText('Laptop Dell')).toBeDefined()
+    expect(screen.getByText('Mouse Logitech')).toBeDefined()
   })
 
   test('TC3: Xử lý tăng số lượng sản phẩm', async () => {
@@ -261,7 +261,7 @@ describe('Cart Component Integration Tests', () => {
     )
 
     const checkoutButton = screen.getByRole('button', { name: /Tiến hành thanh toán/i })
-    expect(checkoutButton).not.toBeDisabled()
+    expect(checkoutButton.disabled).toBe(false)
   })
 
   test('TC7: Hiển thị loading state', () => {
@@ -281,6 +281,6 @@ describe('Cart Component Integration Tests', () => {
       />,
     )
 
-    expect(screen.getByText('Đang tải giỏ hàng...')).toBeInTheDocument()
+    expect(screen.getByText('Đang tải giỏ hàng...')).toBeDefined()
   })
 })

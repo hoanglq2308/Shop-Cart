@@ -5,11 +5,17 @@ import * as inventoryService from '../src/services/inventoryService'
 vi.mock('../src/services/orderService')
 vi.mock('../src/services/inventoryService')
 
+type PurchaseItem = {
+  productId: string
+  price: number
+  quantity: number
+}
+
 beforeEach(() => {
   vi.clearAllMocks()
 })
 
-async function purchaseFlow(items) {
+async function purchaseFlow(items: PurchaseItem[]) {
   const stockResult = await inventoryService.checkStock(items)
 
   if (!stockResult.available) {
@@ -18,7 +24,7 @@ async function purchaseFlow(items) {
 
   return orderService.createOrder({
     items,
-    total: items.reduce((sum, item) => sum + item.price * item.quantity, 0),
+    total: items.reduce((sum: number, item: PurchaseItem) => sum + item.price * item.quantity, 0),
   })
 }
 

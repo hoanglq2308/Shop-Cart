@@ -37,6 +37,10 @@ jobs:
         working-directory: frontend
         run: npx playwright test tests/e2e/cart.e2e.spec.js
 
+      - name: Run Purchase E2E Tests (Playwright)
+        working-directory: frontend
+        run: npx playwright test tests/e2e/purchase.e2e.spec.js
+
       - name: Upload Playwright Report
         if: always()
         uses: actions/upload-artifact@v4
