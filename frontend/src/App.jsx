@@ -4,7 +4,6 @@ import { useToast } from './components/ToastProvider'
 import Footer from './components/Footer'
 import TopBar from './components/TopBar'
 import { loadAccounts, loadCurrentUserEmail, saveAccounts, saveCurrentUserEmail } from './utils/authStorage'
-import { products } from './data/products'
 import CartPage from './page/CartPage'
 import CheckoutPage from './page/CheckoutPage'
 import SuccessPage from './page/SuccessPage'
@@ -19,37 +18,42 @@ function App() {
   const [cartItems, setCartItems] = useState([])
   const [isLoadingCart, setIsLoadingCart] = useState(false)
 
-  // Fetch cart from backend on mount
-  useEffect(() => {
-    loadCartFromBackend()
-  }, [])
-
-  const loadCartFromBackend = async () => {
+  async function loadCartFromBackend() {
     try {
       setIsLoadingCart(true)
       const response = await getCart()
       if (response.success && response.cartItems) {
         // Transform backend cart items to frontend format
-        const transformedItems = response.cartItems.map(item => ({
+        const transformedItems = response.cartItems.map((item) => ({
           cartItemId: item.cartItemId,
           product: {
             id: item.productId,
             name: item.productName,
             price: parseFloat(item.price),
             stock: item.stock,
+            imageUrl: item.imageUrl,
           },
           quantity: item.quantity,
         }))
         setCartItems(transformedItems)
       }
       setIsLoadingCart(false)
-    } catch (error) {
-      console.error('Failed to load cart:', error)
+    } catch {
+      console.error('Failed to load cart:')
       setIsLoadingCart(false)
       // Initialize with empty cart on error
       setCartItems([])
     }
   }
+
+  // Fetch cart from backend on mount
+  useEffect(() => {
+    const timeoutId = window.setTimeout(() => {
+      void loadCartFromBackend()
+    }, 0)
+
+    return () => window.clearTimeout(timeoutId)
+  }, [])
 
   const cartCount = useMemo(
     () => cartItems.reduce((sum, item) => sum + item.quantity, 0),
@@ -77,12 +81,12 @@ function App() {
       } else {
         addToast({ type: 'error', title: 'Lỗi', description: response.message })
       }
-    } catch (error) {
+    } catch {
       addToast({ type: 'error', title: 'Lỗi', description: 'Không thể thêm vào giỏ hàng' })
     }
   }
 
-  const handleIncreaseItem = async (cartItemId, productId) => {
+  const handleIncreaseItem = async (cartItemId) => {
     const item = cartItems.find(i => i.cartItemId === cartItemId)
     if (!item) return
 
@@ -95,18 +99,18 @@ function App() {
       } else {
         addToast({ type: 'error', title: 'Lỗi', description: response.message })
       }
-    } catch (error) {
+    } catch {
       addToast({ type: 'error', title: 'Lỗi', description: 'Không thể cập nhật số lượng' })
     }
   }
 
-  const handleDecreaseItem = async (cartItemId, productId) => {
+  const handleDecreaseItem = async (cartItemId) => {
     const item = cartItems.find(i => i.cartItemId === cartItemId)
     if (!item) return
 
     if (item.quantity <= 1) {
       // Remove item if quantity is 1
-      await handleRemoveItem(cartItemId, productId)
+      await handleRemoveItem(cartItemId)
       return
     }
 
@@ -119,12 +123,12 @@ function App() {
       } else {
         addToast({ type: 'error', title: 'Lỗi', description: response.message })
       }
-    } catch (error) {
+    } catch {
       addToast({ type: 'error', title: 'Lỗi', description: 'Không thể cập nhật số lượng' })
     }
   }
 
-  const handleRemoveItem = async (cartItemId, productId) => {
+  const handleRemoveItem = async (cartItemId) => {
     try {
       const response = await removeCartItem(cartItemId)
       if (response.success) {
@@ -133,7 +137,7 @@ function App() {
       } else {
         addToast({ type: 'error', title: 'Lỗi', description: response.message })
       }
-    } catch (error) {
+    } catch {
       addToast({ type: 'error', title: 'Lỗi', description: 'Không thể xóa sản phẩm' })
     }
   }

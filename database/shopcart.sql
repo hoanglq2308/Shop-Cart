@@ -19,6 +19,7 @@ CREATE TABLE users (
 CREATE TABLE products (
     id BIGSERIAL PRIMARY KEY,
     name VARCHAR(255) NOT NULL,
+    image_url VARCHAR(512),
     price NUMERIC(10, 2) NOT NULL CHECK (price >= 0),
     stock_quantity INT NOT NULL CHECK (stock_quantity >= 0),
     status VARCHAR(20) NOT NULL DEFAULT 'ACTIVE' CHECK (status IN ('ACTIVE', 'INACTIVE'))
@@ -101,11 +102,11 @@ INSERT INTO users (email, full_name, phone, password, role) VALUES
 ('quanghoang@sgu.edu.vn', 'Quang Hoàng', '0901234567', '123456', 'CUSTOMER'),
 ('tester@gmail.com', 'Nguyen Van Test', '0987654321', '123456', 'CUSTOMER');
 
-INSERT INTO products (name, price, stock_quantity, status) VALUES 
-('Màn hình ASUS 24 inch', 2500000.00, 50, 'ACTIVE'),
-('Bàn phím cơ', 1500000.00, 1, 'ACTIVE'),
-('Chuột Gaming', 500000.00, 0, 'ACTIVE'),
-('Tai nghe cũ', 300000.00, 10, 'INACTIVE');
+INSERT INTO products (name, image_url, price, stock_quantity, status) VALUES 
+('Màn hình ASUS 24 inch', 'http://localhost:8081/product/manhinh.webp', 2500000.00, 50, 'ACTIVE'),
+('Bàn phím cơ', 'http://localhost:8081/product/phimco.webp', 1500000.00, 1, 'ACTIVE'),
+('Chuột Gaming', 'http://localhost:8081/product/chuot.webp', 500000.00, 0, 'ACTIVE'),
+('Tai nghe cũ', 'http://localhost:8081/product/tainghe.png', 300000.00, 10, 'INACTIVE');
 
 INSERT INTO coupons (code, discount_type, discount_value, min_order_value, usage_limit, used_count, expiry_date, is_active) VALUES 
 ('GIAM10', 'PERCENTAGE', 10.00, 0.00, 100, 5, '2026-12-31 23:59:59', TRUE),
