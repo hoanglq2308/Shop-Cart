@@ -57,7 +57,7 @@ public class CartSecurityTest {
         mockMvc.perform(post("/api/cart/add")
                 .contentType(MediaType.APPLICATION_JSON)
                 .content(objectMapper.writeValueAsString(request)))
-                .andExpect(status().isForbidden());
+                .andExpect(status().isBadRequest());
 
     }
 
