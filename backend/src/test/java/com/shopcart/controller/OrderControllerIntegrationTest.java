@@ -14,6 +14,7 @@ import java.util.List;
 import com.shopcart.dto.OrderCreateRequest;
 import com.shopcart.dto.OrderCreateRequest.Customer;
 import com.shopcart.dto.OrderCreateRequest.OrderItemRequest;
+import com.shopcart.dto.OrderPricingResponse;
 import com.shopcart.service.OrderService;
 
 import org.junit.jupiter.api.DisplayName;
@@ -57,6 +58,15 @@ public class OrderControllerIntegrationTest {
             .total(BigDecimal.valueOf(30050000L))
             .build();
 
+        OrderPricingResponse pricing = OrderPricingResponse.builder()
+            .subtotal(BigDecimal.valueOf(15000000L))
+            .shippingFee(BigDecimal.valueOf(15000L))
+            .discountAmount(BigDecimal.ZERO)
+            .total(BigDecimal.valueOf(15015000L))
+            .couponCode(null)
+            .build();
+        
+        when(orderService.calculatePricing(any())).thenReturn(pricing);
         when(orderService.processOrder(any(), any())).thenReturn("ORD-001");
 
         mockMvc.perform(post("/orders")
@@ -67,7 +77,7 @@ public class OrderControllerIntegrationTest {
             .andExpect(jsonPath("$.message").value("Đặt hàng thành công"))
             .andExpect(jsonPath("$.orderId").value("ORD-001"))
             .andExpect(jsonPath("$.payment").value("COD"))
-            .andExpect(jsonPath("$.total").value(30050000));
+            .andExpect(jsonPath("$.total").value(15015000));
     }
 
     @Test

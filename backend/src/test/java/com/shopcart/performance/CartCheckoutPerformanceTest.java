@@ -38,6 +38,7 @@ import com.shopcart.dto.CartResponse;
 import com.shopcart.dto.OrderCreateRequest;
 import com.shopcart.dto.OrderCreateRequest.Customer;
 import com.shopcart.dto.OrderCreateRequest.OrderItemRequest;
+import com.shopcart.dto.OrderPricingResponse;
 import com.shopcart.service.CartService;
 import com.shopcart.service.OrderService;
 
@@ -96,6 +97,15 @@ class CartCheckoutPerformanceTest {
     @Test
     @DisplayName("Checkout API load test - 10 concurrent users, 40 requests")
     void checkoutLoadTest() throws Exception {
+        OrderPricingResponse pricing = OrderPricingResponse.builder()
+            .subtotal(BigDecimal.valueOf(15000000L))
+            .shippingFee(BigDecimal.valueOf(15000L))
+            .discountAmount(BigDecimal.ZERO)
+            .total(BigDecimal.valueOf(15015000L))
+            .couponCode(null)
+            .build();
+        
+        when(orderService.calculatePricing(any())).thenReturn(pricing);
         when(orderService.processOrder(any(), any())).thenAnswer(invocation -> {
             TimeUnit.MILLISECONDS.sleep(8);
             return "ORD-PERF-001";
