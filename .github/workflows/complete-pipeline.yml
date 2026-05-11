@@ -54,11 +54,11 @@ jobs:
 
       - name: Run Backend Unit Tests
         working-directory: backend
-        run: bash ./mvnw clean test -DskipITs
+        run: ./mvnw clean test -DskipITs
 
       - name: Generate JaCoCo Report
         working-directory: backend
-        run: bash ./mvnw jacoco:report
+        run: ./mvnw jacoco:report
         continue-on-error: true
 
       - name: Upload Backend Test Results
