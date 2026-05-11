@@ -44,7 +44,9 @@ describe('Checkout integration tests', () => {
     })
     fireEvent.click(screen.getByRole('button', { name: 'Áp dụng' }))
 
-    expect(rowValue('Tổng cộng')).toBe('2.465.000 đ')
+    return waitFor(() => {
+      expect(rowValue('Tổng cộng')).toBe('2.465.000 đ')
+    })
 
     fireEvent.click(screen.getByRole('button', { name: /Tiến hành thanh toán/i }))
     expect(handleCheckout).toHaveBeenCalledTimes(1)
@@ -72,6 +74,7 @@ describe('Checkout integration tests', () => {
         cartItems={cartItems}
         customerDefaults={{ email: 'buyer@example.com' }}
         isAuthenticated={false}
+        appliedCoupon={{ code: 'WELCOME50', discountType: 'FIXED_AMOUNT', discountValue: 50000 }}
         onBackToCart={handleBackToCart}
         onPlaceOrder={handlePlaceOrder}
       />,
@@ -101,6 +104,7 @@ describe('Checkout integration tests', () => {
         total: 30465000,
         payment: 'COD',
         guest: true,
+        couponCode: 'WELCOME50',
         items: [
           { productId: 1, quantity: 2 },
           { productId: 2, quantity: 1 },
@@ -110,6 +114,7 @@ describe('Checkout integration tests', () => {
 
     const payload = createOrder.mock.calls[0][0]
     expect(payload.total).toBe(30465000)
+    expect(payload.couponCode).toBe('WELCOME50')
     expect(payload.customer.fullName).toBe('Nguyễn Văn A')
     expect(payload.customer.cityLabel).toBe('Hồ Chí Minh')
     expect(payload.customer.districtLabel).toBe('Quận 1')

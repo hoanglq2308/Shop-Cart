@@ -2,6 +2,19 @@ import { expect, test } from '@playwright/test'
 import { CartPage } from '../page-objects/CartPage'
 import { CheckoutPage } from '../page-objects/CheckoutPage'
 
+const authState = {
+  currentUserEmail: 'tester@example.com',
+  currentUserName: 'Tester User',
+  accounts: [
+    {
+      email: 'tester@example.com',
+      name: 'Tester User',
+      savedAddress: null,
+      orders: [],
+    },
+  ],
+}
+
 const productsFixture = [
   {
     id: 1,
@@ -28,6 +41,12 @@ const productsFixture = [
 
 test.describe('Purchase E2E flow', () => {
   test.beforeEach(async ({ page }) => {
+    await page.addInitScript((state) => {
+      window.localStorage.setItem('shopcart.currentUserEmail', state.currentUserEmail)
+      window.localStorage.setItem('currentUserName', state.currentUserName)
+      window.localStorage.setItem('shopcart.accounts', JSON.stringify(state.accounts))
+    }, authState)
+
     // Mock products endpoint
     await page.route('**/api/products', async (route) => {
       await route.fulfill({
@@ -363,7 +382,7 @@ test.describe('Purchase E2E flow', () => {
     const initialTotal = await checkoutPage.getTotalPrice()
 
     // Try invalid coupon
-    await cartPage.applyCoupon('INVALID123')
+    await cartPage.applyCoupon('INVALID123', { expectSuccess: false })
     
     // Total should not change
     const totalAfterInvalid = await checkoutPage.getTotalPrice()

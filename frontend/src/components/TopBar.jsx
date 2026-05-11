@@ -1,10 +1,9 @@
 const navItems = [
   { key: 'shop', label: 'Cửa hàng' },
-  { key: 'new', label: 'Hàng mới về' },
   { key: 'about', label: 'Giới thiệu' },
 ]
 
-export default function TopBar({ activePage, cartCount, currentUser, onNavigateShop, onNavigateCart, onOpenAuth }) {
+export default function TopBar({ activePage, cartCount, currentUser, onNavigateShop, onNavigateAbout, onNavigateCart, onOpenAuth }) {
   return (
     <header className="sticky top-0 z-50 border-b border-zinc-200 bg-white/95 shadow-sm backdrop-blur">
       <div className="mx-auto flex w-full max-w-[1280px] items-center justify-between px-4 py-4 md:px-8">
@@ -25,7 +24,7 @@ export default function TopBar({ activePage, cartCount, currentUser, onNavigateS
                   : 'border-b-2 border-transparent pb-1 font-medium text-zinc-600 transition-colors hover:text-zinc-900'
               }
               key={item.label}
-              onClick={item.key === 'shop' ? onNavigateShop : undefined}
+              onClick={item.key === 'shop' ? onNavigateShop : onNavigateAbout}
               type="button"
             >
               {item.label}
@@ -43,13 +42,6 @@ export default function TopBar({ activePage, cartCount, currentUser, onNavigateS
               {currentUser ? 'person' : 'login'}
             </span>
             <span>{currentUser ? currentUser.name.split(' ')[0] : 'Đăng nhập'}</span>
-          </button>
-
-          <button
-            aria-label="Tìm kiếm"
-            className="rounded-full p-2 transition-colors hover:bg-zinc-100 hover:text-zinc-900"
-          >
-            <span className="material-symbols-outlined">search</span>
           </button>
 
           <button

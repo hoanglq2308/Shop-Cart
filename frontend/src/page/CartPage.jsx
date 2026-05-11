@@ -8,6 +8,8 @@ export default function CartPage({
   onIncreaseItem,
   onRemoveItem,
   onCheckout,
+  appliedCoupon,
+  onCouponApplied,
   isLoading,
 }) {
   const subtotal = useMemo(
@@ -56,7 +58,12 @@ export default function CartPage({
           </div>
 
           <div className="lg:col-span-4">
-            <OrderSummary onCheckout={onCheckout} subtotal={subtotal} />
+            <OrderSummary
+              appliedCoupon={appliedCoupon}
+              onCheckout={onCheckout}
+              onCouponApplied={onCouponApplied}
+              subtotal={subtotal}
+            />
           </div>
         </div>
       )}

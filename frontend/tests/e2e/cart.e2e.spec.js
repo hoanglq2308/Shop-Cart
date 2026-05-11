@@ -1,6 +1,19 @@
 import { expect, test } from '@playwright/test'
 import { CartPage } from '../page-objects/CartPage'
 
+const authState = {
+  currentUserEmail: 'tester@example.com',
+  currentUserName: 'Tester User',
+  accounts: [
+    {
+      email: 'tester@example.com',
+      name: 'Tester User',
+      savedAddress: null,
+      orders: [],
+    },
+  ],
+}
+
 const productsFixture = [
   {
     id: 1,
@@ -27,6 +40,12 @@ const productsFixture = [
 
 test.describe('Cart E2E flow', () => {
   test.beforeEach(async ({ page }) => {
+    await page.addInitScript((state) => {
+      window.localStorage.setItem('shopcart.currentUserEmail', state.currentUserEmail)
+      window.localStorage.setItem('currentUserName', state.currentUserName)
+      window.localStorage.setItem('shopcart.accounts', JSON.stringify(state.accounts))
+    }, authState)
+
     await page.route('**/api/products', async (route) => {
       await route.fulfill({
         status: 200,

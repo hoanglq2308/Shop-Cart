@@ -2,10 +2,10 @@ import { useMemo, useState } from 'react'
 import { useLoading } from '../components/LoadingProvider'
 import { useToast } from '../components/ToastProvider'
 import { createOrder } from '../services/orderService'
+import { calculateOrderPrice } from '../utils/priceCalculation'
 
 const currencyFormatter = new Intl.NumberFormat('vi-VN')
 const SHIPPING_FEE = 15000
-const DISCOUNT = 50000
 
 const cities = [
   { value: 'hcm', label: 'Hồ Chí Minh' },
@@ -19,7 +19,7 @@ const districts = [
   { value: 'tb', label: 'Quận Tân Bình' },
 ]
 
-export default function CheckoutPage({ cartItems, customerDefaults, isAuthenticated, onBackToCart, onPlaceOrder }) {
+export default function CheckoutPage({ cartItems, customerDefaults, isAuthenticated, appliedCoupon, onBackToCart, onPlaceOrder }) {
   const [isSubmitting, setIsSubmitting] = useState(false)
   const { showLoading, hideLoading } = useLoading()
   const { addToast } = useToast()
@@ -29,9 +29,11 @@ export default function CheckoutPage({ cartItems, customerDefaults, isAuthentica
     [cartItems],
   )
 
+  const couponModel = appliedCoupon ? { type: appliedCoupon.discountType, value: appliedCoupon.discountValue } : null
   const shippingFee = subtotal > 0 ? SHIPPING_FEE : 0
-  const discount = subtotal > 0 ? DISCOUNT : 0
-  const total = Math.max(0, subtotal + shippingFee - discount)
+  const pricing = calculateOrderPrice([{ price: subtotal, quantity: 1 }], couponModel, shippingFee)
+  const total = pricing.total
+  const discount = pricing.discount
 
   const handleSubmit = (event) => {
     event.preventDefault()
@@ -63,11 +65,18 @@ export default function CheckoutPage({ cartItems, customerDefaults, isAuthentica
 
     const items = cartItems.map((it) => ({ productId: it.product.id, quantity: it.quantity }))
 
-    const payload = { customer, items, total }
+    const payload = { customer, items, couponCode: appliedCoupon?.code || null, total }
 
     // Try calling backend; if it fails, fallback to local simulated order
     createOrder(payload)
       .then((data) => {
+        if (data && data.success === false) {
+          hideLoading()
+          setIsSubmitting(false)
+          addToast({ type: 'error', title: 'Không thể đặt hàng', description: data.message || 'Dữ liệu đặt hàng không hợp lệ' })
+          return
+        }
+
         // assume backend returns { id, total, payment }
         hideLoading()
         setIsSubmitting(false)
@@ -78,6 +87,8 @@ export default function CheckoutPage({ cartItems, customerDefaults, isAuthentica
           payment: data.payment ?? 'COD',
           items,
           customer,
+          couponCode: appliedCoupon?.code || null,
+          discountAmount: data.discountAmount ?? discount,
           guest: !isAuthenticated,
           createdAt: new Date().toISOString(),
         })
@@ -93,6 +104,8 @@ export default function CheckoutPage({ cartItems, customerDefaults, isAuthentica
           payment: 'COD',
           items,
           customer,
+          couponCode: appliedCoupon?.code || null,
+          discountAmount: discount,
           guest: !isAuthenticated,
           createdAt: new Date().toISOString(),
         })
@@ -268,7 +281,7 @@ export default function CheckoutPage({ cartItems, customerDefaults, isAuthentica
                     <span>{currencyFormatter.format(shippingFee)} đ</span>
                   </div>
                   <div className="flex items-center justify-between text-emerald-700">
-                    <span>Giảm giá</span>
+                    <span>Giảm giá{appliedCoupon?.code ? ` (${appliedCoupon.code})` : ''}</span>
                     <span>- {currencyFormatter.format(discount)} đ</span>
                   </div>
                 </div>

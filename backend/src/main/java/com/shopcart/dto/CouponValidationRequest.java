@@ -11,14 +11,8 @@ import lombok.NoArgsConstructor;
 @Builder
 @NoArgsConstructor
 @AllArgsConstructor
-public class OrderCreateResponse {
-    private boolean success;
-    private String message;
-    private String orderId;
-    private BigDecimal total;
-    private String payment;
+public class CouponValidationRequest {
+    private String code;
     private BigDecimal subtotal;
     private BigDecimal shippingFee;
-    private BigDecimal discountAmount;
-    private String couponCode;
 }

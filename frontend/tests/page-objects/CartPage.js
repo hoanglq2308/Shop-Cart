@@ -73,9 +73,12 @@ export class CartPage {
     await expect(row.getByText(`Chỉ còn ${stock} sản phẩm trong kho!`)).toBeVisible()
   }
 
-  async applyCoupon(code) {
+  async applyCoupon(code, { expectSuccess = true } = {}) {
     const couponInput = this.page.locator('input[id="coupon"]')
     await couponInput.fill(code)
     await this.page.getByRole('button', { name: 'Áp dụng' }).click()
+    if (expectSuccess) {
+      await expect(this.page.getByText('Áp mã giảm giá thành công')).toBeVisible()
+    }
   }
 }

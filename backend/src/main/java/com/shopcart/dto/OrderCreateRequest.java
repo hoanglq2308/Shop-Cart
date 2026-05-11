@@ -16,6 +16,7 @@ public class OrderCreateRequest {
     private Customer customer;
     private List<OrderItemRequest> items;
     private BigDecimal total;
+    private String couponCode;
 
     @Data
     @Builder
