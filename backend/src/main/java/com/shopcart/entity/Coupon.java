@@ -1,9 +1,15 @@
 package com.shopcart.entity;
-import java.math.*;
+
+import java.math.BigDecimal;
 
 import jakarta.persistence.*;
+import lombok.Getter;
+import lombok.Setter;
+
 @Entity
 @Table(name = "coupons")
+@Getter
+@Setter
 public class Coupon {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
@@ -18,7 +24,7 @@ public class Coupon {
     @Column(name = "discount_value", nullable = false)
     private BigDecimal discountValue;
     @Column(name = "min_order_value", nullable = false)
-    private BigDecimal minOderValue =BigDecimal.ZERO ;
+    private BigDecimal minOrderValue = BigDecimal.ZERO;
     @Column(name = "usage_limit", nullable = false)
     private Integer usageLimit = 1;
     @Column(name = "used_count", nullable = false)

@@ -6,6 +6,7 @@ import TopBar from './components/TopBar'
 import { loadAccounts, loadCurrentUserEmail, saveAccounts, saveCurrentUserEmail } from './utils/authStorage'
 import CartPage from './page/CartPage'
 import CheckoutPage from './page/CheckoutPage'
+import AboutPage from './page/AboutPage'
 import SuccessPage from './page/SuccessPage'
 import ShopPage from './page/ShopPage'
 import { getCart, addToCart, updateCartItemQuantity, removeCartItem } from './services/cartService'
@@ -18,6 +19,7 @@ function App() {
   const [isAuthModalOpen, setIsAuthModalOpen] = useState(false)
   const [cartItems, setCartItems] = useState([])
   const [isLoadingCart, setIsLoadingCart] = useState(false)
+  const [appliedCoupon, setAppliedCoupon] = useState(null)
 
   async function loadCartFromBackend() {
     try {
@@ -160,6 +162,10 @@ function App() {
     setActivePage('checkout')
   }
 
+  const handleCouponApplied = (coupon) => {
+    setAppliedCoupon(coupon || null)
+  }
+
   const [lastOrder, setLastOrder] = useState(null)
 
   const handlePlaceOrder = (order) => {
@@ -186,6 +192,7 @@ function App() {
 
     setLastOrder(savedOrder)
     setCartItems([])
+    setAppliedCoupon(null)
     setActivePage('success')
   }
 
@@ -266,6 +273,7 @@ function App() {
         cartItems={cartItems}
         customerDefaults={checkoutDefaults}
         isAuthenticated={Boolean(currentUser)}
+        appliedCoupon={appliedCoupon}
         onBackToCart={() => setActivePage('cart')}
         onPlaceOrder={handlePlaceOrder}
       />
@@ -284,6 +292,7 @@ function App() {
         currentUser={currentUser}
         onOpenAuth={() => setIsAuthModalOpen(true)}
         onNavigateCart={() => setActivePage('cart')}
+        onNavigateAbout={() => setActivePage('about')}
         onNavigateShop={() => setActivePage('shop')}
       />
 
@@ -298,9 +307,13 @@ function App() {
 
       {activePage === 'shop' ? (
         <ShopPage onAddToCart={handleAddToCart} />
+      ) : activePage === 'about' ? (
+        <AboutPage />
       ) : (
         <CartPage
           cartItems={cartItems}
+          appliedCoupon={appliedCoupon}
+          onCouponApplied={handleCouponApplied}
           onCheckout={handleCheckout}
           onDecreaseItem={handleDecreaseItem}
           onIncreaseItem={handleIncreaseItem}

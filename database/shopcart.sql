@@ -114,6 +114,7 @@ INSERT INTO products (name, image_url, price, stock_quantity, status) VALUES
 ('Ổ cứng SSD 1TB Samsung', 'http://localhost:8081/product/ssd_1tb.webp', 1800000.00, 48, 'ACTIVE');
 
 INSERT INTO coupons (code, discount_type, discount_value, min_order_value, usage_limit, used_count, expiry_date, is_active) VALUES 
+('WELCOME50', 'FIXED_AMOUNT', 50000.00, 0.00, 100, 0, '2026-12-31 23:59:59', TRUE),
 ('GIAM10', 'PERCENTAGE', 10.00, 0.00, 100, 5, '2026-12-31 23:59:59', TRUE),
 ('TRU50K', 'FIXED_AMOUNT', 50000.00, 2000000.00, 50, 10, '2026-12-31 23:59:59', TRUE),
 ('HETHAN', 'PERCENTAGE', 20.00, 0.00, 100, 0, '2023-01-01 00:00:00', TRUE),

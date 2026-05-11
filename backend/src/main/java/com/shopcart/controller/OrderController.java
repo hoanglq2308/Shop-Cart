@@ -10,6 +10,7 @@ import org.springframework.web.bind.annotation.RestController;
 
 import com.shopcart.dto.OrderCreateRequest;
 import com.shopcart.dto.OrderCreateResponse;
+import com.shopcart.dto.OrderPricingResponse;
 import com.shopcart.service.OrderService;
 import org.springframework.beans.factory.annotation.Autowired;
 
@@ -31,12 +32,17 @@ public class OrderController {
         }
 
         try {
+            OrderPricingResponse pricing = orderService.calculatePricing(request);
             String orderId = orderService.processOrder(1L, request);
             return ResponseEntity.status(HttpStatus.CREATED).body(OrderCreateResponse.builder()
                 .success(true)
                 .message("Đặt hàng thành công")
                 .orderId(orderId)
-                .total(request.getTotal())
+                .subtotal(pricing.getSubtotal())
+                .shippingFee(pricing.getShippingFee())
+                .discountAmount(pricing.getDiscountAmount())
+                .couponCode(pricing.getCouponCode())
+                .total(pricing.getTotal())
                 .payment("COD")
                 .build());
         } catch (Exception e) {

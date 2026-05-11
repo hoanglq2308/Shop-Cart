@@ -1,20 +1,53 @@
 import { useState } from 'react'
+import { validateCoupon } from '../services/couponService'
+import { calculateOrderPrice } from '../utils/priceCalculation'
 
 const currencyFormatter = new Intl.NumberFormat('vi-VN')
 const SHIPPING_FEE = 15000
-const COUPON_CODE = 'WELCOME50'
-const COUPON_DISCOUNT = 50000
 
-export default function OrderSummary({ subtotal, onCheckout }) {
+export default function OrderSummary({ subtotal, onCheckout, appliedCoupon, onCouponApplied }) {
   const [coupon, setCoupon] = useState('')
-  const [isCouponApplied, setIsCouponApplied] = useState(false)
+  const [localCoupon, setLocalCoupon] = useState(null)
+  const [message, setMessage] = useState('')
+  const [messageType, setMessageType] = useState('')
+  const [isApplying, setIsApplying] = useState(false)
 
   const shippingFee = subtotal > 0 ? SHIPPING_FEE : 0
-  const discount = isCouponApplied ? COUPON_DISCOUNT : 0
-  const total = Math.max(0, subtotal + shippingFee - discount)
+  const effectiveCoupon = appliedCoupon || localCoupon
+  const couponModel = effectiveCoupon ? { type: effectiveCoupon.discountType, value: effectiveCoupon.discountValue } : null
+  const pricing = calculateOrderPrice([{ price: subtotal, quantity: 1 }], couponModel, shippingFee)
 
-  const applyCoupon = () => {
-    setIsCouponApplied(coupon.trim().toUpperCase() === COUPON_CODE)
+  const applyCoupon = async () => {
+    const code = coupon.trim()
+
+    if (!code) {
+      setMessage('Vui lòng nhập mã giảm giá')
+      setMessageType('error')
+      return
+    }
+
+    setIsApplying(true)
+    try {
+      const response = await validateCoupon(code, subtotal, shippingFee)
+      if (response.success) {
+        setLocalCoupon(response.coupon)
+        setMessage(response.message || 'Áp mã giảm giá thành công')
+        setMessageType('success')
+        onCouponApplied?.(response.coupon)
+      } else {
+        setLocalCoupon(null)
+        setMessage(response.message || 'Mã giảm giá không hợp lệ')
+        setMessageType('error')
+        onCouponApplied?.(null)
+      }
+    } catch {
+      setLocalCoupon(null)
+      setMessage('Không thể áp mã giảm giá lúc này')
+      setMessageType('error')
+      onCouponApplied?.(null)
+    } finally {
+      setIsApplying(false)
+    }
   }
 
   return (
@@ -31,15 +64,15 @@ export default function OrderSummary({ subtotal, onCheckout }) {
           <span className="text-zinc-900">{currencyFormatter.format(shippingFee)} đ</span>
         </div>
         <div className="flex justify-between font-medium text-emerald-700">
-          <span>Giảm giá ({COUPON_CODE})</span>
-          <span>-{currencyFormatter.format(discount)} đ</span>
+          <span>Giảm giá{effectiveCoupon?.code ? ` (${effectiveCoupon.code})` : ''}</span>
+          <span>-{currencyFormatter.format(pricing.discount)} đ</span>
         </div>
       </div>
 
       <div className="mb-6 border-t border-zinc-200 pt-4">
         <div className="flex items-center justify-between">
           <span className="text-lg font-semibold text-zinc-900">Tổng cộng</span>
-          <span className="text-xl font-bold text-zinc-900">{currencyFormatter.format(total)} đ</span>
+          <span className="text-xl font-bold text-zinc-900">{currencyFormatter.format(pricing.total)} đ</span>
         </div>
         <p className="mt-1 text-right text-xs text-zinc-500">Đã bao gồm VAT</p>
       </div>
@@ -58,13 +91,19 @@ export default function OrderSummary({ subtotal, onCheckout }) {
             value={coupon}
           />
           <button
-            className="rounded border border-zinc-300 bg-zinc-100 px-4 py-2 text-sm font-medium text-zinc-800 transition-colors hover:bg-zinc-200"
+            className="rounded border border-zinc-300 bg-zinc-100 px-4 py-2 text-sm font-medium text-zinc-800 transition-colors hover:bg-zinc-200 disabled:cursor-not-allowed disabled:opacity-60"
             onClick={applyCoupon}
             type="button"
+            disabled={isApplying}
           >
-            Áp dụng
+            {isApplying ? 'Đang áp...' : 'Áp dụng'}
           </button>
         </div>
+        {message && (
+          <p className={`mt-2 text-xs ${messageType === 'success' ? 'text-emerald-700' : 'text-red-600'}`}>
+            {message}
+          </p>
+        )}
       </div>
 
       <button
