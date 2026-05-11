@@ -70,14 +70,20 @@ function App() {
     return { name: localStorage.getItem('currentUserName') || '', email: currentUserEmail, savedAddress: null, orders: [] };
   }, [accounts, currentUserEmail])
 
-  const handleAddToCart = async (product) => {
+  const handleAddToCart = async (product, quantity = 1) => {
+    if (!currentUserEmail) {
+      addToast({ type: 'warning', title: 'Yêu cầu đăng nhập', description: 'Vui lòng đăng nhập để thêm sản phẩm vào giỏ hàng' })
+      setIsAuthModalOpen(true)
+      return
+    }
+
     if (product.stock === 0) {
       addToast({ type: 'error', title: 'Lỗi', description: 'Sản phẩm đã hết hàng' })
       return
     }
 
     try {
-      const response = await addToCart(`P${product.id}`, 1)
+      const response = await addToCart(`P${product.id}`, quantity)
       if (response.success) {
         // Reload cart from backend
         await loadCartFromBackend()

@@ -106,7 +106,12 @@ INSERT INTO products (name, image_url, price, stock_quantity, status) VALUES
 ('Màn hình ASUS 24 inch', 'http://localhost:8081/product/manhinh.webp', 2500000.00, 50, 'ACTIVE'),
 ('Bàn phím cơ', 'http://localhost:8081/product/phimco.webp', 1500000.00, 1, 'ACTIVE'),
 ('Chuột Gaming', 'http://localhost:8081/product/chuot.webp', 500000.00, 0, 'ACTIVE'),
-('Tai nghe cũ', 'http://localhost:8081/product/tainghe.png', 300000.00, 10, 'INACTIVE');
+('Tai nghe cũ', 'http://localhost:8081/product/tainghe.png', 300000.00, 10, 'INACTIVE'),
+('Laptop Dell Inspiron 15', 'http://localhost:8081/product/laptop_dell.webp', 15500000.00, 50, 'ACTIVE'),
+('Apple MacBook Air M1', 'http://localhost:8081/product/macbook_m1.webp', 18990000.00, 45, 'ACTIVE'),
+('Samsung Galaxy S23 Ultra', 'http://localhost:8081/product/s23_ultra.webp', 24500000.00, 60, 'ACTIVE'),
+('Tai nghe Sony WH-1000XM5', 'http://localhost:8081/product/sony_wh.webp', 6500000.00, 55, 'ACTIVE'),
+('Ổ cứng SSD 1TB Samsung', 'http://localhost:8081/product/ssd_1tb.webp', 1800000.00, 48, 'ACTIVE');
 
 INSERT INTO coupons (code, discount_type, discount_value, min_order_value, usage_limit, used_count, expiry_date, is_active) VALUES 
 ('GIAM10', 'PERCENTAGE', 10.00, 0.00, 100, 5, '2026-12-31 23:59:59', TRUE),

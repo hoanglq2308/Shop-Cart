@@ -1,3 +1,5 @@
+import { useState } from 'react'
+
 const currencyFormatter = new Intl.NumberFormat('vi-VN')
 
 function getStockLabel(stock) {
@@ -24,6 +26,19 @@ function getStockLabel(stock) {
 export default function ProductCard({ product, onAddToCart }) {
   const stockLabel = getStockLabel(product.stock)
   const isOutOfStock = product.stock === 0
+  const [quantity, setQuantity] = useState(1)
+
+  const handleDecrease = () => {
+    if (quantity > 1) {
+      setQuantity((q) => q - 1)
+    }
+  }
+
+  const handleIncrease = () => {
+    if (quantity < product.stock) {
+      setQuantity((q) => q + 1)
+    }
+  }
 
   return (
     <article
@@ -60,6 +75,27 @@ export default function ProductCard({ product, onAddToCart }) {
         <p className={`mt-auto pt-2 text-lg font-bold ${isOutOfStock ? 'text-zinc-500' : 'text-zinc-900'}`}>
           {currencyFormatter.format(product.price)} đ
         </p>
+
+        {!isOutOfStock && (
+          <div className="mt-1 flex items-center justify-between border border-zinc-200 rounded px-3 py-1.5 bg-zinc-50">
+            <button
+              onClick={handleDecrease}
+              disabled={quantity <= 1}
+              className="text-zinc-500 hover:text-emerald-700 disabled:opacity-30 disabled:cursor-not-allowed font-bold px-2 py-0.5"
+            >
+              -
+            </button>
+            <span className="text-sm font-medium w-6 text-center">{quantity}</span>
+            <button
+              onClick={handleIncrease}
+              disabled={quantity >= product.stock}
+              className="text-zinc-500 hover:text-emerald-700 disabled:opacity-30 disabled:cursor-not-allowed font-bold px-2 py-0.5"
+            >
+              +
+            </button>
+          </div>
+        )}
+
         <button
           className={`mt-2 flex w-full items-center justify-center gap-2 rounded px-3 py-2 font-medium text-sm transition ${
             isOutOfStock
@@ -67,7 +103,7 @@ export default function ProductCard({ product, onAddToCart }) {
               : 'bg-emerald-700 text-white hover:bg-emerald-800'
           }`}
           disabled={isOutOfStock}
-          onClick={() => onAddToCart(product)}
+          onClick={() => onAddToCart(product, quantity)}
           type="button"
         >
           <span className="material-symbols-outlined text-[18px]">
