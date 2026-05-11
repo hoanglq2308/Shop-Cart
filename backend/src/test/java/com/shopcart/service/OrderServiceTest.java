@@ -49,6 +49,7 @@ public class OrderServiceTest {
         p.setId(productId);
         p.setName("Widget");
         p.setStockQuantity(5);
+        p.setPrice(new java.math.BigDecimal("10000.00"));
 
         when(productRepository.findById(productId)).thenReturn(Optional.of(p));
 
@@ -104,6 +105,7 @@ public class OrderServiceTest {
         p.setId(productId);
         p.setName("Gadget");
         p.setStockQuantity(1);
+        p.setPrice(new java.math.BigDecimal("50000.00"));
 
         when(productRepository.findById(productId)).thenReturn(Optional.of(p));
 

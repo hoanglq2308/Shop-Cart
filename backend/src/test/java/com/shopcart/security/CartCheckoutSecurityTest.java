@@ -26,6 +26,7 @@ import com.shopcart.dto.CartResponse;
 import com.shopcart.dto.OrderCreateRequest;
 import com.shopcart.dto.OrderCreateRequest.Customer;
 import com.shopcart.dto.OrderCreateRequest.OrderItemRequest;
+import com.shopcart.dto.OrderPricingResponse;
 import com.shopcart.dto.QuantityUpdateRequest;
 import com.shopcart.service.CartService;
 import com.shopcart.service.OrderService;
@@ -91,6 +92,15 @@ class CartCheckoutSecurityTest {
     @Test
     @DisplayName("Checkout request succeeds without CSRF token")
     void checkoutWithoutCsrfTokenIsAllowed() throws Exception {
+        OrderPricingResponse pricing = OrderPricingResponse.builder()
+            .subtotal(BigDecimal.valueOf(1500000L))
+            .shippingFee(BigDecimal.valueOf(15000L))
+            .discountAmount(BigDecimal.ZERO)
+            .total(BigDecimal.valueOf(1515000L))
+            .couponCode(null)
+            .build();
+        
+        when(orderService.calculatePricing(any())).thenReturn(pricing);
         when(orderService.processOrder(any(), any())).thenReturn("ORD-SEC-001");
 
         OrderCreateRequest request = OrderCreateRequest.builder()
